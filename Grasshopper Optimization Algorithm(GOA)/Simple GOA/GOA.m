@@ -4,6 +4,9 @@ clear;
 close all;
 
 %% Problem Definition
+global NFE;
+NFE=0;
+
 CostFunction = @(x) Sphere(x);  % Cost Function
 
 nVar = 3;                       % Number of Decision Variables
@@ -27,6 +30,7 @@ Paramas.nPop = nPop;
 %% Initialization
 empty_GrassHopper.Position = [];
 empty_GrassHopper.Cost = [];
+empty_GrassHopper.Out = [];
 
 GrassHopper = repmat(empty_GrassHopper,nPop,1);
 
@@ -36,12 +40,11 @@ for i=1:nPop
     GrassHopper(i).Position = unifrnd(VarMin,VarMax,VarSize);
     
     % Evaluate
-    GrassHopper(i).Cost = CostFunction(GrassHopper(i).Position);
+    [GrassHopper(i).Cost, GrassHopper(i).Out] = CostFunction(GrassHopper(i).Position);
 
 end
-NFE = nPop;
 [~, indx] = min([GrassHopper.Cost]);
-TargetGH = GrassHopper(indx);                   % Target GrassHopper
+GlobalBest = GrassHopper(indx);                   % Target GrassHopper
 
 BestCost = zeros(1,MaxIt);
 MeanCost = zeros(1,MaxIt);
@@ -59,23 +62,22 @@ for it=1:MaxIt
         Paramas.i = i;
         GrassHoppers = cat(1,GrassHopper.Position);     % Position of All GrassHoppers
         SI = SocialInteraction(GrassHoppers, Paramas);              % Calculate Social Interaction
-        GrassHopper(i).Position = c*SI + TargetGH.Position;       % Calculate Grasshopper Position
+        GrassHopper(i).Position = c*SI + GlobalBest.Position;       % Calculate Grasshopper Position
 
         GrassHopper(i).Position = min(max(GrassHopper(i).Position,VarMin),VarMax);
         
         % Evaluation
-        GrassHopper(i).Cost = CostFunction(GrassHopper(i).Position);        % Evaluation
+        [GrassHopper(i).Cost, GrassHopper(i).Out] = CostFunction(GrassHopper(i).Position);        % Evaluation
         
         % Update Target
-        if GrassHopper(i).Cost < TargetGH.Cost
-            TargetGH = GrassHopper(i);
+        if GrassHopper(i).Cost < GlobalBest.Cost
+            GlobalBest = GrassHopper(i);
         end
     end
 
-    BestCost(it) = TargetGH.Cost;
+    BestCost(it) = GlobalBest.Cost;
     MeanCost(it) = mean([GrassHopper.Cost]);
     WorstCost(it) = max([GrassHopper.Cost]);
-    NFE = NFE + nPop;
     nfe(it) = NFE;
 
         % Display Results on Command Line
