@@ -104,15 +104,6 @@ for it=1:MaxIt
 
         % Evaluation
         [particle(i).Cost ,particle(i).Out] = CostFunction(particle(i).Position);
-        
-        % Mutate Personal Best
-        NewSol.Position = Mutate(particle(i).Position);
-        [NewSol.Cost ,NewSol.Out] = CostFunction(NewSol.Position);
-        if NewSol.Cost <= particle(i).Cost
-            particle(i).Position = NewSol.Position;
-            particle(i).Cost = NewSol.Cost;
-            particle(i).Out = NewSol.Out;
-        end
 
         % Update Personal Best
         if particle(i).Cost < particle(i).Best.Cost
@@ -130,13 +121,6 @@ for it=1:MaxIt
 
         end        
 
-    end
-
-    % Mutate Global Best
-    NewSol.Position = Mutate(GlobalBest.Position);
-    [NewSol.Cost ,NewSol.Out] = CostFunction(NewSol.Position);
-    if NewSol.Cost <= GlobalBest.Cost
-        GlobalBest = NewSol;
     end
 
     BestCost(it) = GlobalBest.Cost;
