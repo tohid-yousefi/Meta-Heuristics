@@ -24,9 +24,9 @@ nPop = 100;                       % Population Size
 cMax = 1;
 cMin = 1e-4;
 
-Paramas.lb = VarMin;
-Paramas.ub = VarMax;
-Paramas.nPop = nPop;
+Params.lb = VarMin;
+Params.ub = VarMax;
+Params.nPop = nPop;
 
 %% Initialization
 empty_GrassHopper.Position = [];
@@ -56,17 +56,25 @@ nfe = zeros(1,MaxIt);
 for it=1:MaxIt
 
     c = cMax - it * ((cMax - cMin)/MaxIt);          % Update c Parameter
-    Paramas.c = c;
+    Params.c = c;
 
     for i=1:nPop
     
-        Paramas.i = i;
+        Params.i = i;
         GrassHoppers = cat(1,GrassHopper.Position);     % Position of All GrassHoppers
-        SI = SocialInteraction(GrassHoppers, Paramas);              % Calculate Social Interaction
+        SI = SocialInteraction(GrassHoppers, Params);              % Calculate Social Interaction
         GrassHopper(i).Position = c*SI + GlobalBest.Position;       % Calculate Grasshopper Position
 
         GrassHopper(i).Position = min(max(GrassHopper(i).Position,VarMin),VarMax);
         
+        % Mutate Personal Best
+        NewSol.Position = Mutate(GrassHopper(i).Position);
+        [NewSol.Cost ,NewSol.Out] = CostFunction(NewSol.Position);
+        if NewSol.Cost <= GrassHopper(i).Cost
+            GrassHopper(i).Position = NewSol.Position;
+            GrassHopper(i).Cost = NewSol.Cost;
+            GrassHopper(i).Out = NewSol.Out;
+        end
         % Evaluation
         [GrassHopper(i).Cost, GrassHopper(i).Out] = CostFunction(GrassHopper(i).Position);        % Evaluation
         
@@ -74,6 +82,13 @@ for it=1:MaxIt
         if GrassHopper(i).Cost < GlobalBest.Cost
             GlobalBest = GrassHopper(i);
         end
+    end
+    
+    % Mutate Global Best
+    NewSol.Position = Mutate(GlobalBest.Position);
+    [NewSol.Cost ,NewSol.Out] = CostFunction(NewSol.Position);
+    if NewSol.Cost <= GlobalBest.Cost
+        GlobalBest = NewSol;
     end
 
     BestCost(it) = GlobalBest.Cost;
@@ -83,7 +98,7 @@ for it=1:MaxIt
 
         % Display Results on Command Line
     disp(['Iteration ' num2str(it) ': NFE = ' num2str(nfe(it)) ', Best Cost = ' num2str(BestCost(it))]);
-    
+
     figure(1);
     PlotSolution(GlobalBest.Out.Tour,model)
 end
