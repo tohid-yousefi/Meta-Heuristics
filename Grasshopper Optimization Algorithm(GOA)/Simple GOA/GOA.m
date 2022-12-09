@@ -23,9 +23,9 @@ nPop = 50;                       % Population Size
 cMax = 1;
 cMin = 1e-4;
 
-Paramas.lb = VarMin;
-Paramas.ub = VarMax;
-Paramas.nPop = nPop;
+Params.lb = VarMin;
+Params.ub = VarMax;
+Params.nPop = nPop;
 
 %% Initialization
 empty_GrassHopper.Position = [];
@@ -55,13 +55,13 @@ nfe = zeros(1,MaxIt);
 for it=1:MaxIt
 
     c = cMax - it * ((cMax - cMin)/MaxIt);          % Update c Parameter
-    Paramas.c = c;
+    Params.c = c;
 
     for i=1:nPop
     
-        Paramas.i = i;
+        Params.i = i;
         GrassHoppers = cat(1,GrassHopper.Position);     % Position of All GrassHoppers
-        SI = SocialInteraction(GrassHoppers, Paramas);              % Calculate Social Interaction
+        SI = SocialInteraction(GrassHoppers, Params);              % Calculate Social Interaction
         GrassHopper(i).Position = c*SI + GlobalBest.Position;       % Calculate Grasshopper Position
 
         GrassHopper(i).Position = min(max(GrassHopper(i).Position,VarMin),VarMax);
