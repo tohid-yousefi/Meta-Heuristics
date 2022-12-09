@@ -1,4 +1,4 @@
-# Simple GOA
+# Simple GOA with Plot Positions
 <hr />
 
 In this section, we optimized the **Sphere** function using **G**rasshopper **O**ptimization **A**lgorithm and we weill also plot grasshopper positions
